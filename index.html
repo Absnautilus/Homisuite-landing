@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="homisuite è la suite operativa per hotel che centralizza richieste ospiti, turni, transfer, ristoranti ed esperienze in un unico spazio condiviso." />
+  <meta name="theme-color" content="#17182b" />
+  <title>homisuite — L’operatività dell’hotel, in un unico spazio</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="assets/homisuite-icon-256.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="#top" aria-label="homisuite home">
+        <img src="assets/homisuite-icon-256.png" alt="" class="brand-icon" />
+        <span>homisuite</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Navigazione principale">
+        <a href="#prodotto">Prodotto</a>
+        <a href="#moduli">Moduli</a>
+        <a href="#come-funziona">Come funziona</a>
+        <a href="#perche">Perché homisuite</a>
+      </nav>
+
+      <a class="button button-small button-primary" href="#early-access">Richiedi early access</a>
+      <button class="menu-toggle" aria-label="Apri menu" aria-expanded="false">☰</button>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero section">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">EARLY ACCESS</span>
+          <h1>L’unica suite che mette davvero al centro <span>l’operatività dell’hotel.</span></h1>
+          <p class="hero-lead">Migliora il lavoro di tutti, compreso il tuo. Staff più organizzato, efficiente e sereno. Ospiti più soddisfatti. Meno caos, meno messaggi dispersi, più controllo.</p>
+          <p class="origin-line">Creata da chi lavora in hotel, per chi lavora in hotel.</p>
+
+          <div class="hero-actions">
+            <a class="button button-primary" href="#early-access">Richiedi accesso anticipato <span aria-hidden="true">→</span></a>
+            <a class="button button-secondary" href="#moduli">Scopri i moduli</a>
+          </div>
+
+          <div class="hero-chips" aria-label="Punti di forza">
+            <div class="chip"><span class="chip-icon">⌂</span><span>Pensata per hotel indipendenti</span></div>
+            <div class="chip"><span class="chip-icon">↯</span><span>Setup semplice</span></div>
+            <div class="chip"><span class="chip-icon">◎</span><span>Staff multilingue</span></div>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-label="Mockup homisuite">
+          <div class="multilingual-card glass-card">
+            <div class="round-icon">🌐</div>
+            <strong>Pensata anche per uno staff multilingue.</strong>
+            <p>Un’interfaccia chiara, leggibile e adatta alla collaborazione quotidiana tra team diversi.</p>
+          </div>
+
+          <div class="laptop-shell">
+            <div class="screen">
+              <aside class="mock-sidebar">
+                <div class="mock-brand"><img src="assets/homisuite-icon-256.png" alt=""><span>homisuite</span></div>
+                <button class="mock-nav active">Richieste</button>
+                <button class="mock-nav">Soggiorni</button>
+                <button class="mock-nav">Ristorante & Esperienze</button>
+                <button class="mock-nav">Transfer</button>
+                <button class="mock-nav">Gestione</button>
+                <button class="mock-nav">Team</button>
+              </aside>
+
+              <div class="mock-main">
+                <div class="mock-topbar">
+                  <div>
+                    <small>Dashboard</small>
+                    <h3>Benvenuto!</h3>
+                  </div>
+                  <div class="mock-avatar">AM</div>
+                </div>
+
+                <div class="mock-kpis">
+                  <article><span class="kpi-icon purple">◉</span><strong>12</strong><small>Richieste attive</small></article>
+                  <article><span class="kpi-icon mint">●</span><strong>28</strong><small>Ospiti in struttura</small></article>
+                  <article><span class="kpi-icon coral">◆</span><strong>5</strong><small>Prenotazioni ristorante</small></article>
+                  <article><span class="kpi-icon blue">▣</span><strong>3</strong><small>Transfer programmati</small></article>
+                </div>
+
+                <div class="mock-list">
+                  <div class="list-header"><strong>Richieste recenti</strong><span>Vedi tutte →</span></div>
+                  <div class="mock-row"><span class="row-icon blue">▣</span><div><strong>Transfer aeroporto</strong><small>Camera 101 · 2 ospiti</small></div><time>10:24</time><span class="status lavender">Nuova</span></div>
+                  <div class="mock-row"><span class="row-icon coral">◆</span><div><strong>Prenotazione ristorante</strong><small>Camera 205 · 4 ospiti</small></div><time>09:47</time><span class="status pale-blue">In corso</span></div>
+                  <div class="mock-row"><span class="row-icon gold">✦</span><div><strong>Esperienza locale</strong><small>Camera 303 · 2 ospiti</small></div><time>09:12</time><span class="status pale-gold">Richiesta</span></div>
+                  <div class="mock-row"><span class="row-icon mint">◷</span><div><strong>Late check-out</strong><small>Camera 117 · 1 ospite</small></div><time>08:50</time><span class="status pale-mint">Completata</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="laptop-base"></div>
+          </div>
+
+          <div class="phone-shell">
+            <div class="phone-notch"></div>
+            <div class="phone-content">
+              <div class="phone-brand"><img src="assets/homisuite-icon-256.png" alt=""><span>homisuite</span></div>
+              <h3>Ciao 👋</h3>
+              <p>Qui trovi tutto ciò che ti serve per una giornata perfetta.</p>
+              <div class="phone-item">Richieste <span>›</span></div>
+              <div class="phone-item">Soggiorni <span>›</span></div>
+              <div class="phone-item">Ristorante & Esperienze <span>›</span></div>
+              <div class="phone-item">Transfer <span>›</span></div>
+              <div class="phone-item">Gestione <span>›</span></div>
+              <div class="phone-item">Team <span>›</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="prodotto" class="section section-tight">
+      <div class="container intro-grid">
+        <div>
+          <span class="section-label">COS’È HOMISUITE</span>
+          <h2>Un unico spazio per il lavoro quotidiano dell’hotel.</h2>
+        </div>
+        <div class="intro-copy">
+          <p>homisuite riunisce attività operative, richieste degli ospiti, turni, transfer e prenotazioni in un ambiente condiviso. L’obiettivo è semplice: ridurre passaggi inutili, messaggi sparsi e informazioni perse tra un reparto e l’altro.</p>
+          <p>È progettata per essere immediata anche in team internazionali: meno attrito nell’uso quotidiano, più chiarezza su cosa fare e chi se ne sta occupando.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="moduli" class="section modules-section">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <span class="section-label">I MODULI</span>
+            <h2>Cosa include homisuite</h2>
+          </div>
+          <p>Tutto ciò che serve per coordinare l’operatività quotidiana in hotel, in un unico spazio condiviso.</p>
+        </div>
+
+        <div class="module-grid">
+          <article class="module-card">
+            <div class="module-icon">▦</div>
+            <div><h3>Shift Planner</h3><p>Turni, disponibilità e cambi in un unico calendario condiviso.</p></div>
+            <span class="card-arrow">›</span>
+          </article>
+          <article class="module-card">
+            <div class="module-icon">•••</div>
+            <div><h3>Guest Requests</h3><p>Le richieste degli ospiti arrivano al team giusto, senza passaggi confusi.</p></div>
+            <span class="card-arrow">›</span>
+          </article>
+          <article class="module-card">
+            <div class="module-icon">♨</div>
+            <div><h3>Restaurants & Experiences</h3><p>Prenotazioni di ristoranti, attività ed esperienze gestite in modo semplice.</p></div>
+            <span class="card-arrow">›</span>
+          </article>
+          <article class="module-card">
+            <div class="module-icon">▣</div>
+            <div><h3>Transfer</h3><p>Pickup, driver e corse operative senza messaggi sparsi.</p></div>
+            <span class="card-arrow">›</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="come-funziona" class="section process-section">
+      <div class="container">
+        <div class="section-heading single">
+          <div><span class="section-label">COME FUNZIONA</span><h2>Da richiesta a completamento, senza perdere il filo.</h2></div>
+        </div>
+
+        <div class="steps-grid">
+          <article class="step-card"><span class="step-number">1</span><h3>Configura struttura e team</h3><p>Imposta reparti, ruoli e accessi in base a come lavora il tuo hotel.</p></article>
+          <div class="step-arrow">→</div>
+          <article class="step-card"><span class="step-number">2</span><h3>Ricevi richieste e prenotazioni</h3><p>Tutto entra in un unico flusso operativo, visibile alle persone giuste.</p></article>
+          <div class="step-arrow">→</div>
+          <article class="step-card"><span class="step-number">3</span><h3>Assegna e monitora</h3><p>Sai sempre cosa è aperto, in corso o completato e chi se ne sta occupando.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="perche" class="section benefits-section">
+      <div class="container benefits-grid">
+        <div>
+          <span class="section-label">PERCHÉ HOMISUITE</span>
+          <h2>Meno caos. Più controllo. Un team che lavora meglio.</h2>
+          <div class="benefit-list">
+            <div class="benefit-pill"><span>✦</span>Meno messaggi sparsi</div>
+            <div class="benefit-pill"><span>◎</span>Passaggi di consegne più chiari</div>
+            <div class="benefit-pill"><span>↯</span>Tempi di risposta più rapidi</div>
+            <div class="benefit-pill"><span>🌐</span>Adatta a uno staff multilingue</div>
+          </div>
+        </div>
+        <aside class="team-card">
+          <div class="round-icon">◎</div>
+          <h3>Pensata per la collaborazione quotidiana tra reparti diversi e staff multilingue.</h3>
+          <p>Interfacce essenziali, responsabilità chiare e meno dipendenza da chat, fogli e passaggi verbali.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section id="early-access" class="section cta-section">
+      <div class="container cta-card">
+        <div>
+          <span class="section-label light">EARLY ACCESS</span>
+          <h2>Stiamo costruendo homisuite insieme agli hotel.</h2>
+          <p>Le tue idee contano. Cerchiamo strutture che vogliano provare il prodotto in anteprima e aiutarci a costruire uno strumento davvero utile nell’operatività quotidiana.</p>
+        </div>
+        <form class="early-form" id="earlyForm">
+          <label>
+            <span>Email di lavoro</span>
+            <input type="email" name="email" placeholder="nome@hotel.it" required />
+          </label>
+          <label>
+            <span>Hotel</span>
+            <input type="text" name="hotel" placeholder="Nome struttura" required />
+          </label>
+          <button class="button button-light" type="submit">Richiedi early access →</button>
+          <small>Nessuno spam. Ti contatteremo solo per homisuite.</small>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-row">
+      <a class="brand footer-brand" href="#top"><img src="assets/homisuite-icon-256.png" alt=""><span>homisuite</span></a>
+      <p>Creata da chi lavora in hotel, per chi lavora in hotel.</p>
+      <span>© 2026 homisuite</span>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
