@@ -35,6 +35,9 @@ if (earlyForm) {
   const customSelectResets = [];
 
   const initCustomSelect = (select) => {
+    const isMultiple = select.multiple;
+    const labelSpan = select.parentElement.querySelector(':scope > span');
+
     const wrapper = document.createElement('div');
     wrapper.className = 'select-field js-enhanced';
 
@@ -46,9 +49,15 @@ if (earlyForm) {
     trigger.innerHTML = '<span class="select-trigger-text is-placeholder"></span><svg class="icon icon-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>';
     const triggerText = trigger.querySelector('.select-trigger-text');
 
+    if (labelSpan) {
+      if (!labelSpan.id) labelSpan.id = `${select.name}-label`;
+      trigger.setAttribute('aria-labelledby', labelSpan.id);
+    }
+
     const listbox = document.createElement('ul');
     listbox.className = 'select-listbox';
     listbox.setAttribute('role', 'listbox');
+    if (isMultiple) listbox.setAttribute('aria-multiselectable', 'true');
     listbox.tabIndex = -1;
     listbox.hidden = true;
 
@@ -62,7 +71,13 @@ if (earlyForm) {
       li.setAttribute('role', 'option');
       li.setAttribute('aria-selected', 'false');
       li.dataset.value = opt.value;
-      li.textContent = opt.textContent;
+      li.dataset.label = opt.textContent;
+      const label = document.createElement('span');
+      label.textContent = opt.textContent;
+      li.appendChild(label);
+      if (isMultiple) {
+        li.insertAdjacentHTML('beforeend', '<svg class="icon li-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>');
+      }
       listbox.appendChild(li);
     });
 
@@ -110,16 +125,45 @@ if (earlyForm) {
       }
     };
 
+    const updateMultiTriggerText = () => {
+      const selected = items().filter((el) => el.getAttribute('aria-selected') === 'true');
+      if (selected.length === 0) {
+        triggerText.textContent = placeholderText;
+        triggerText.classList.add('is-placeholder');
+      } else if (selected.length === 1) {
+        triggerText.textContent = selected[0].dataset.label;
+        triggerText.classList.remove('is-placeholder');
+      } else {
+        triggerText.textContent = `${selected.length} selezionati`;
+        triggerText.classList.remove('is-placeholder');
+      }
+    };
+
     const selectOption = (li) => {
       items().forEach((el) => el.setAttribute('aria-selected', 'false'));
       li.setAttribute('aria-selected', 'true');
       select.value = li.dataset.value;
       select.dispatchEvent(new Event('change', { bubbles: true }));
-      triggerText.textContent = li.textContent;
+      triggerText.textContent = li.dataset.label;
       triggerText.classList.remove('is-placeholder');
       clearInvalid();
       setExpanded(false);
       trigger.focus();
+    };
+
+    const toggleOption = (li) => {
+      const nowSelected = li.getAttribute('aria-selected') !== 'true';
+      li.setAttribute('aria-selected', String(nowSelected));
+      const option = Array.from(select.options).find((opt) => opt.value === li.dataset.value);
+      if (option) option.selected = nowSelected;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+      updateMultiTriggerText();
+      clearInvalid();
+    };
+
+    const activateOption = (li) => {
+      if (isMultiple) toggleOption(li);
+      else selectOption(li);
     };
 
     trigger.addEventListener('click', () => {
@@ -143,7 +187,7 @@ if (earlyForm) {
         setActiveOption(list[list.length - 1]);
       } else if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
-        if (list[activeIndex]) selectOption(list[activeIndex]);
+        if (list[activeIndex]) activateOption(list[activeIndex]);
       } else if (event.key === 'Escape') {
         event.preventDefault();
         setExpanded(false);
@@ -155,7 +199,7 @@ if (earlyForm) {
 
     listbox.addEventListener('click', (event) => {
       const li = event.target.closest('li[role="option"]');
-      if (li) selectOption(li);
+      if (li) activateOption(li);
     });
 
     document.addEventListener('click', (event) => {
@@ -235,7 +279,15 @@ if (earlyForm) {
 
     try {
       const data = new FormData(earlyForm);
-      console.log('Early access request', Object.fromEntries(data.entries()));
+      const payload = {};
+      for (const [key, value] of data.entries()) {
+        if (key in payload) {
+          payload[key] = Array.isArray(payload[key]) ? [...payload[key], value] : [payload[key], value];
+        } else {
+          payload[key] = value;
+        }
+      }
+      console.log('Early access request', payload);
 
       await submitEarlyAccess();
 

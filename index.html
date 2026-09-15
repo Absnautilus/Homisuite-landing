@@ -243,7 +243,7 @@
           <fieldset class="form-step" id="earlyFormStep2" data-step="2">
             <legend class="sr-only">Qualche dettaglio in più</legend>
             <div class="form-row">
-              <label>
+              <div class="field">
                 <span><svg class="icon icon-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>Il tuo ruolo</span>
                 <select name="role" required>
                   <option value="" disabled selected hidden>Seleziona…</option>
@@ -254,8 +254,8 @@
                   <option value="owner">Proprietà</option>
                   <option value="other">Altro</option>
                 </select>
-              </label>
-              <label>
+              </div>
+              <div class="field">
                 <span><svg class="icon icon-bed-double" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8" /><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4" /><path d="M12 4v6" /><path d="M2 18h20" /></svg>Numero camere</span>
                 <select name="rooms_range" required>
                   <option value="" disabled selected hidden>Seleziona…</option>
@@ -265,12 +265,11 @@
                   <option value="101-200">101–200</option>
                   <option value="200+">200+</option>
                 </select>
-              </label>
+              </div>
             </div>
-            <label>
-              <span><svg class="icon icon-list-checks" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 5h8" /><path d="M13 12h8" /><path d="M13 19h8" /><path d="m3 17 2 2 4-4" /><path d="m3 7 2 2 4-4" /></svg>Cosa vorresti semplificare per primo?</span>
-              <select name="main_problem" required>
-                <option value="" disabled selected hidden>Seleziona…</option>
+            <div class="field">
+              <span><svg class="icon icon-list-checks" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 5h8" /><path d="M13 12h8" /><path d="M13 19h8" /><path d="m3 17 2 2 4-4" /><path d="m3 7 2 2 4-4" /></svg>Cosa vorresti semplificare? <small class="field-hint">(puoi sceglierne più di uno)</small></span>
+              <select name="main_problem" required multiple>
                 <option value="guest_requests">Richieste degli ospiti</option>
                 <option value="shift_planning">Turni e organizzazione dello staff</option>
                 <option value="internal_communication">Comunicazione tra reparti</option>
@@ -279,10 +278,10 @@
                 <option value="handover">Passaggi di consegne</option>
                 <option value="other">Altro</option>
               </select>
-            </label>
+            </div>
 
             <label class="checkbox-field">
-              <input type="checkbox" name="marketing_consent" />
+              <input type="checkbox" name="marketing_consent" role="switch" />
               <span>Voglio ricevere aggiornamenti sul lancio e sulle novità di homisuite.</span>
             </label>
 
