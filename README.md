@@ -33,6 +33,13 @@ Il form è volutamente front-end only. In `script.js` trovi il punto in cui coll
 - un endpoint proprietario
 - qualsiasi CRM o provider email
 
+## Email di conferma Early Access
+
+`email-templates/early-access-confirmation.html` è il template dell'email da
+inviare a chi compila il form, in stile coerente con la landing. Il template e
+le istruzioni per l'invio (da implementare nel backend `homisuite-app`, non
+qui) sono documentate in `email-templates/README.md`.
+
 ## Asset
 
 L'icona homisuite si trova in `assets/homisuite-icon-256.png`.
