@@ -229,6 +229,27 @@ fieldset.form-step { border: 0; padding: 0; margin: 0; min-width: 0; }
 .form-message.is-success { color: #bdf5d0; }
 .form-message.is-error { color: #ffd0d0; }
 
+.select-field { position: relative; }
+.select-native { position: absolute; opacity: 0; width: 1px; height: 1px; padding: 0; margin: 0; border: 0; pointer-events: none; }
+.select-trigger { all: unset; box-sizing: border-box; width: 100%; height: 46px; border-radius: 12px; border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.92); padding: 0 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--navy); font: inherit; font-weight: 600; cursor: pointer; }
+.select-trigger-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.select-trigger-text.is-placeholder { color: #83839f; font-weight: 500; }
+.select-trigger .icon-chevron-down { width: 18px; height: 18px; color: var(--purple-2); flex-shrink: 0; transition: transform .15s ease; }
+.select-trigger[aria-expanded="true"] .icon-chevron-down { transform: rotate(180deg); }
+.select-trigger:focus-visible,
+.select-trigger[aria-expanded="true"] { box-shadow: 0 0 0 3px rgba(255,255,255,.28); }
+.select-trigger.is-invalid { box-shadow: 0 0 0 2px #ff9a9a inset; }
+
+.select-listbox { position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 30; margin: 0; padding: 6px; list-style: none; background: white; border-radius: 14px; box-shadow: 0 20px 45px rgba(30, 18, 64, .28); border: 1px solid rgba(111, 54, 220, .1); max-height: 230px; overflow-y: auto; }
+.select-listbox[hidden] { display: none; }
+.select-listbox li { padding: 10px 12px; border-radius: 9px; font-size: .88rem; font-weight: 600; color: #40415f; cursor: pointer; }
+.select-listbox li.is-active,
+.select-listbox li:hover { background: var(--lavender); color: var(--purple-2); }
+.select-listbox li[aria-selected="true"] { background: var(--purple-soft); color: var(--purple-2); font-weight: 800; }
+
+.field-error { margin: 5px 2px 0; font-size: .72rem; font-weight: 700; color: #ffd0d0; }
+.field-error[hidden] { display: none; }
+
 .site-footer { padding:38px 0 46px; }
 .footer-row { display:flex;align-items:center;gap:28px;color:#858aa4;font-size:.84rem;border-top:1px solid rgba(60,54,96,.08);padding-top:28px}.footer-row p{margin:0 auto}.footer-brand{font-size:1rem}.footer-brand img{width:28px;height:28px;border-radius:8px}
 
