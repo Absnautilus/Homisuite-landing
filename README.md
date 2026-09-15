@@ -26,12 +26,70 @@ Importa il repository in Vercel. Non sono necessarie impostazioni di build: è u
 
 ## Form early access
 
-Il form è volutamente front-end only. In `script.js` trovi il punto in cui collegare:
+Il form invia una richiesta `POST` all'endpoint Early Access del backend
+**homisuite-app** (repository separato) — una Supabase Edge Function, non
+un'API su questo dominio.
 
-- Supabase / Edge Function
-- Formspree
-- un endpoint proprietario
-- qualsiasi CRM o provider email
+### Endpoint
+
+```
+POST <HOMISUITE_API_BASE_URL>/early-access-signup
+```
+
+dove l'URL reale è:
+
+```
+https://<project-ref>.supabase.co/functions/v1
+```
+
+(`<project-ref>` è il project ref del progetto Supabase di homisuite-app —
+chiedilo al team backend, non è pubblicato qui). Il backend valida tutto
+server-side, salva/aggiorna il lead e invia la notifica a
+`info@homisuite.com` — questa landing non parla mai direttamente con
+Supabase e non conosce nessuna chiave segreta.
+
+### Configurazione locale
+
+Questo è un sito **statico puro** (nessun `package.json`, nessun Vite,
+nessun build step) — non esiste quindi un meccanismo `VITE_*`/env var
+iniettato in build. La base URL dell'endpoint è una **costante** in cima a
+`script.js`:
+
+```js
+const HOMISUITE_API_BASE_URL = 'https://REPLACE_WITH_SUPABASE_PROJECT_REF.supabase.co/functions/v1';
+```
+
+Modifica quella riga con il project ref reale prima di pubblicare in un
+ambiente (development/production) — è l'unico punto da toccare per
+cambiare a quale backend punta il form. Se in futuro questo sito diventa
+un progetto Vite (o altro bundler), quella costante è il punto naturale da
+sostituire con `import.meta.env.VITE_HOMISUITE_API_BASE_URL`.
+
+### Comportamento del form
+
+- Campi: email di lavoro, hotel, ruolo, numero camere, problema principale
+  (tutti obbligatori) + consenso marketing (facoltativo, default `false`
+  — la richiesta funziona anche senza).
+- Un campo nascosto (`website`, honeypot) è presente nel DOM ma invisibile
+  e non raggiungibile da tastiera per un utente reale; un bot che lo
+  compila riceve una risposta di successo apparente, ma nulla viene
+  salvato né notificato.
+- In caso di invio riuscito il bottone si disabilita e mostra "Invio in
+  corso…", per evitare doppi invii; il risultato (nuova richiesta,
+  richiesta aggiornata, o errore) è mostrato inline sotto al form
+  (`aria-live="polite"`), mai con `alert()`.
+- Nessun dettaglio tecnico del backend viene mai mostrato in caso di
+  errore.
+
+### UTM
+
+Alla prima apertura della pagina, se l'URL contiene `utm_source`,
+`utm_medium`, `utm_campaign`, `utm_content` e/o `utm_term`, questi vengono
+salvati in `sessionStorage` (non un cookie) e restano disponibili per
+tutta la sessione del tab, anche se l'utente naviga nella pagina prima di
+compilare il form. Vengono allegati automaticamente all'invio, insieme a
+`landing_path` (il path corrente). Non sono mai mostrati come campi nel
+form.
 
 ## Asset
 

@@ -213,17 +213,71 @@
           <h2>Stiamo costruendo homisuite insieme agli hotel.</h2>
           <p>Le tue idee contano. Cerchiamo strutture che vogliano provare il prodotto in anteprima e aiutarci a costruire uno strumento davvero utile nell’operatività quotidiana.</p>
         </div>
-        <form class="early-form" id="earlyForm">
+        <form class="early-form" id="earlyForm" novalidate>
           <label>
             <span>Email di lavoro</span>
-            <input type="email" name="email" placeholder="nome@hotel.it" required />
+            <input type="email" name="email" placeholder="nome@hotel.it" required autocomplete="email" />
           </label>
           <label>
             <span>Hotel</span>
-            <input type="text" name="hotel" placeholder="Nome struttura" required />
+            <input type="text" name="hotel_name" placeholder="Nome struttura" required autocomplete="organization" />
           </label>
+          <div class="early-form-row">
+            <label>
+              <span>Il tuo ruolo</span>
+              <select name="role" required>
+                <option value="" disabled selected>Seleziona…</option>
+                <option value="general_manager">General Manager</option>
+                <option value="front_office_manager">Front Office Manager</option>
+                <option value="front_office">Front Office / Reception</option>
+                <option value="operations">Operations</option>
+                <option value="owner">Proprietà</option>
+                <option value="other">Altro</option>
+              </select>
+            </label>
+            <label>
+              <span>Numero camere</span>
+              <select name="rooms_range" required>
+                <option value="" disabled selected>Seleziona…</option>
+                <option value="1-20">1–20</option>
+                <option value="21-50">21–50</option>
+                <option value="51-100">51–100</option>
+                <option value="101-200">101–200</option>
+                <option value="200+">200+</option>
+              </select>
+            </label>
+          </div>
+          <label>
+            <span>Cosa vorresti semplificare per primo?</span>
+            <select name="main_problem" required>
+              <option value="" disabled selected>Seleziona…</option>
+              <option value="guest_requests">Richieste degli ospiti</option>
+              <option value="shift_planning">Turni e organizzazione dello staff</option>
+              <option value="internal_communication">Comunicazione tra reparti</option>
+              <option value="transfer">Transfer e trasporti</option>
+              <option value="restaurants_experiences">Ristoranti ed esperienze</option>
+              <option value="handover">Passaggi di consegne</option>
+              <option value="other">Altro</option>
+            </select>
+          </label>
+          <label class="early-form-checkbox">
+            <input type="checkbox" name="marketing_consent" />
+            <span>Voglio ricevere aggiornamenti sul lancio e sulle novità di homisuite.</span>
+          </label>
+
+          <!-- Honeypot: a real visitor never sees or reaches this (aria-hidden,
+               tabindex="-1", positioned off-screen rather than display:none so a
+               bot that specifically skips display:none fields doesn't skip this
+               one). Anything a bot writes here is sent to the backend, which
+               treats a non-empty value as a signal to fake a normal success
+               response without saving anything or sending a notification. -->
+          <div class="early-form-hp" aria-hidden="true">
+            <input type="text" name="website" tabindex="-1" autocomplete="off" />
+          </div>
+
           <button class="button button-light" type="submit">Richiedi early access →</button>
-          <small>Nessuno spam. Ti contatteremo solo per homisuite.</small>
+          <p class="early-form-status" role="status" aria-live="polite"></p>
+          <small>Useremo i tuoi dati per gestire la richiesta di early access. Gli aggiornamenti commerciali saranno inviati solo se scegli di riceverli.</small>
         </form>
       </div>
     </section>
