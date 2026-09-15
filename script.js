@@ -59,7 +59,7 @@ if (earlyForm) {
     listbox.setAttribute('role', 'listbox');
     if (isMultiple) listbox.setAttribute('aria-multiselectable', 'true');
     listbox.tabIndex = -1;
-    listbox.hidden = true;
+    listbox.setAttribute('aria-hidden', 'true');
 
     const placeholderOption = select.querySelector('option[value=""]');
     const placeholderText = placeholderOption ? placeholderOption.textContent : 'Seleziona…';
@@ -117,7 +117,8 @@ if (earlyForm) {
 
     const setExpanded = (expanded) => {
       trigger.setAttribute('aria-expanded', String(expanded));
-      listbox.hidden = !expanded;
+      listbox.classList.toggle('is-open', expanded);
+      listbox.setAttribute('aria-hidden', String(!expanded));
       if (expanded) {
         const current = items().find((el) => el.getAttribute('aria-selected') === 'true') || items()[0];
         setActiveOption(current);
