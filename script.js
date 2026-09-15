@@ -13,6 +13,83 @@ document.querySelectorAll('.nav-links a').forEach(link => {
   });
 });
 
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Scroll-reveal: sections fade/slide in as they enter the viewport. The
+// hiding class only ever applies once JS has actually run (js-reveal-ready),
+// so a page with JS disabled or failed never leaves content stuck invisible.
+const revealEls = document.querySelectorAll('.reveal');
+if (revealEls.length) {
+  if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+    revealEls.forEach((el) => el.classList.add('is-visible'));
+  } else {
+    document.documentElement.classList.add('js-reveal-ready');
+    const revealGroups = new Map();
+    revealEls.forEach((el) => {
+      const index = revealGroups.get(el.parentElement) || 0;
+      el.style.transitionDelay = `${Math.min(index, 5) * 70}ms`;
+      revealGroups.set(el.parentElement, index + 1);
+    });
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+    revealEls.forEach((el) => revealObserver.observe(el));
+  }
+}
+
+// Dashboard mockup KPI numbers count up from 0 the first time they scroll into view.
+const kpiContainer = document.querySelector('.mock-kpis');
+if (kpiContainer && 'IntersectionObserver' in window) {
+  const kpiNumbers = kpiContainer.querySelectorAll('strong');
+  const animateCount = (el) => {
+    const target = parseInt(el.textContent, 10);
+    if (Number.isNaN(target)) return;
+    if (prefersReducedMotion) return;
+    const duration = 900;
+    const start = performance.now();
+    const step = (now) => {
+      const progress = Math.min(1, (now - start) / duration);
+      const eased = 1 - (1 - progress) ** 3;
+      el.textContent = String(Math.round(target * eased));
+      if (progress < 1) requestAnimationFrame(step);
+      else el.textContent = String(target);
+    };
+    requestAnimationFrame(step);
+  };
+  const kpiObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      kpiNumbers.forEach(animateCount);
+      observer.disconnect();
+    });
+  }, { threshold: 0.4 });
+  kpiObserver.observe(kpiContainer);
+}
+
+// Subtle pointer-driven tilt on the laptop/phone mockup, desktop-with-mouse only.
+const heroVisual = document.querySelector('.hero-visual');
+const laptopShell = document.querySelector('.laptop-shell');
+const phoneShell = document.querySelector('.phone-shell');
+if (heroVisual && laptopShell && !prefersReducedMotion && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+  heroVisual.addEventListener('mousemove', (event) => {
+    const rect = heroVisual.getBoundingClientRect();
+    const px = (event.clientX - rect.left) / rect.width - 0.5;
+    const py = (event.clientY - rect.top) / rect.height - 0.5;
+    laptopShell.style.transform = `rotateX(${(-py * 6).toFixed(2)}deg) rotateY(${(px * 8).toFixed(2)}deg)`;
+    if (phoneShell) {
+      phoneShell.style.transform = `rotateX(${(-py * 9).toFixed(2)}deg) rotateY(${(px * 11).toFixed(2)}deg) translateY(${(-py * 6).toFixed(2)}px)`;
+    }
+  });
+  heroVisual.addEventListener('mouseleave', () => {
+    laptopShell.style.transform = '';
+    if (phoneShell) phoneShell.style.transform = '';
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Early access form -> homisuite-app's early-access-signup Edge Function
 // (a separate repository/deployment; see README's "Form early access").
@@ -67,87 +144,313 @@ function readStoredUtmParams() {
 captureUtmParams();
 
 const earlyForm = document.querySelector('#earlyForm');
-const earlyFormButton = earlyForm?.querySelector('button[type="submit"]');
-const earlyFormStatus = earlyForm?.querySelector('.early-form-status');
-const EARLY_FORM_DEFAULT_LABEL = earlyFormButton?.textContent ?? 'Richiedi early access →';
 
-function setEarlyFormStatus(message, tone) {
-  if (!earlyFormStatus) return;
-  earlyFormStatus.textContent = message;
-  earlyFormStatus.classList.remove('is-error', 'is-success');
-  if (tone) earlyFormStatus.classList.add(tone === 'error' ? 'is-error' : 'is-success');
-}
+if (earlyForm) {
+  const step1 = earlyForm.querySelector('#earlyFormStep1');
+  const step2 = earlyForm.querySelector('#earlyFormStep2');
+  const nextBtn = earlyForm.querySelector('#earlyFormNext');
+  const backBtn = earlyForm.querySelector('#earlyFormBack');
+  const submitBtn = earlyForm.querySelector('#earlyFormSubmit');
+  const submitLabel = submitBtn.querySelector('.btn-label');
+  const submitSpinner = submitBtn.querySelector('.icon-loader-2');
+  const messageEl = earlyForm.querySelector('#earlyFormMessage');
+  const progressDots = earlyForm.querySelectorAll('[data-step-dot]');
+  const progressFill = earlyForm.querySelector('#earlyFormProgressFill');
+  const progressLabel = earlyForm.querySelector('#earlyFormProgressLabel');
 
-function isValidEmail(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
+  const successIcon = '<svg class="icon icon-check-circle-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" pathLength="1" /><path d="m16 9-5.5 5.5L8 12" pathLength="1" /></svg>';
+  const errorIcon = '<svg class="icon icon-alert-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" pathLength="1" /><line x1="12" x2="12" y1="8" y2="12" pathLength="1" /><line x1="12" x2="12.01" y1="16" y2="16" pathLength="1" /></svg>';
 
-let earlyFormSubmitting = false;
+  let isSubmitting = false;
+  const customSelectResets = [];
 
-earlyForm?.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  if (earlyFormSubmitting) return;
+  const initCustomSelect = (select) => {
+    const isMultiple = select.multiple;
+    const labelSpan = select.parentElement.querySelector(':scope > span');
 
-  const data = new FormData(earlyForm);
-  const payload = {
-    email: String(data.get('email') || '').trim().toLowerCase(),
-    hotel_name: String(data.get('hotel_name') || '').trim(),
-    role: String(data.get('role') || ''),
-    rooms_range: String(data.get('rooms_range') || ''),
-    main_problem: String(data.get('main_problem') || ''),
-    marketing_consent: data.get('marketing_consent') === 'on',
-    ...readStoredUtmParams(),
-    landing_path: window.location.pathname,
-    // Honeypot -- a real visitor never sees or reaches this field. Sent
-    // as-is; the backend decides what a non-empty value means.
-    website: String(data.get('website') || ''),
+    const wrapper = document.createElement('div');
+    wrapper.className = 'select-field js-enhanced';
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'select-trigger';
+    trigger.setAttribute('aria-haspopup', 'listbox');
+    trigger.setAttribute('aria-expanded', 'false');
+    trigger.innerHTML = '<span class="select-trigger-text is-placeholder"></span><svg class="icon icon-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>';
+    const triggerText = trigger.querySelector('.select-trigger-text');
+
+    if (labelSpan) {
+      if (!labelSpan.id) labelSpan.id = `${select.name}-label`;
+      trigger.setAttribute('aria-labelledby', labelSpan.id);
+    }
+
+    const listbox = document.createElement('ul');
+    listbox.className = 'select-listbox';
+    listbox.setAttribute('role', 'listbox');
+    if (isMultiple) listbox.setAttribute('aria-multiselectable', 'true');
+    listbox.tabIndex = -1;
+    listbox.setAttribute('aria-hidden', 'true');
+
+    const placeholderOption = select.querySelector('option[value=""]');
+    const placeholderText = placeholderOption ? placeholderOption.textContent : 'Seleziona…';
+    triggerText.textContent = placeholderText;
+
+    Array.from(select.options).filter((opt) => opt.value !== '').forEach((opt, i) => {
+      const li = document.createElement('li');
+      li.id = `${select.name}-option-${i}`;
+      li.setAttribute('role', 'option');
+      li.setAttribute('aria-selected', 'false');
+      li.dataset.value = opt.value;
+      li.dataset.label = opt.textContent;
+      const label = document.createElement('span');
+      label.textContent = opt.textContent;
+      li.appendChild(label);
+      if (isMultiple) {
+        li.insertAdjacentHTML('beforeend', '<svg class="icon li-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>');
+      }
+      listbox.appendChild(li);
+    });
+
+    const error = document.createElement('p');
+    error.className = 'field-error';
+    error.setAttribute('role', 'alert');
+    error.hidden = true;
+
+    select.parentElement.insertBefore(wrapper, select);
+    wrapper.append(trigger, listbox, select, error);
+    select.classList.add('select-native');
+    select.tabIndex = -1;
+    select.setAttribute('aria-hidden', 'true');
+
+    const items = () => Array.from(listbox.querySelectorAll('li'));
+
+    const setActiveOption = (li) => {
+      items().forEach((el) => el.classList.remove('is-active'));
+      if (!li) return;
+      li.classList.add('is-active');
+      listbox.setAttribute('aria-activedescendant', li.id);
+      li.scrollIntoView({ block: 'nearest' });
+    };
+
+    const clearInvalid = () => {
+      trigger.classList.remove('is-invalid');
+      error.hidden = true;
+    };
+
+    const markInvalid = () => {
+      trigger.classList.add('is-invalid');
+      error.textContent = 'Seleziona un’opzione.';
+      error.hidden = false;
+      trigger.focus();
+    };
+    select.reportCustomInvalidity = markInvalid;
+
+    const setExpanded = (expanded) => {
+      trigger.setAttribute('aria-expanded', String(expanded));
+      listbox.classList.toggle('is-open', expanded);
+      listbox.setAttribute('aria-hidden', String(!expanded));
+      if (expanded) {
+        const current = items().find((el) => el.getAttribute('aria-selected') === 'true') || items()[0];
+        setActiveOption(current);
+        listbox.focus();
+      }
+    };
+
+    const updateMultiTriggerText = () => {
+      const selected = items().filter((el) => el.getAttribute('aria-selected') === 'true');
+      if (selected.length === 0) {
+        triggerText.textContent = placeholderText;
+        triggerText.classList.add('is-placeholder');
+      } else if (selected.length === 1) {
+        triggerText.textContent = selected[0].dataset.label;
+        triggerText.classList.remove('is-placeholder');
+      } else {
+        triggerText.textContent = `${selected.length} selezionati`;
+        triggerText.classList.remove('is-placeholder');
+      }
+    };
+
+    const selectOption = (li) => {
+      items().forEach((el) => el.setAttribute('aria-selected', 'false'));
+      li.setAttribute('aria-selected', 'true');
+      select.value = li.dataset.value;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+      triggerText.textContent = li.dataset.label;
+      triggerText.classList.remove('is-placeholder');
+      clearInvalid();
+      setExpanded(false);
+      trigger.focus();
+    };
+
+    const toggleOption = (li) => {
+      const nowSelected = li.getAttribute('aria-selected') !== 'true';
+      li.setAttribute('aria-selected', String(nowSelected));
+      const option = Array.from(select.options).find((opt) => opt.value === li.dataset.value);
+      if (option) option.selected = nowSelected;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+      updateMultiTriggerText();
+      clearInvalid();
+    };
+
+    const activateOption = (li) => {
+      if (isMultiple) toggleOption(li);
+      else selectOption(li);
+    };
+
+    trigger.addEventListener('click', () => {
+      setExpanded(trigger.getAttribute('aria-expanded') !== 'true');
+    });
+
+    listbox.addEventListener('keydown', (event) => {
+      const list = items();
+      const activeIndex = list.findIndex((el) => el.classList.contains('is-active'));
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        setActiveOption(list[Math.min(list.length - 1, activeIndex + 1)]);
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        setActiveOption(list[Math.max(0, activeIndex - 1)]);
+      } else if (event.key === 'Home') {
+        event.preventDefault();
+        setActiveOption(list[0]);
+      } else if (event.key === 'End') {
+        event.preventDefault();
+        setActiveOption(list[list.length - 1]);
+      } else if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        if (list[activeIndex]) activateOption(list[activeIndex]);
+      } else if (event.key === 'Escape') {
+        event.preventDefault();
+        setExpanded(false);
+        trigger.focus();
+      } else if (event.key === 'Tab') {
+        setExpanded(false);
+      }
+    });
+
+    listbox.addEventListener('click', (event) => {
+      const li = event.target.closest('li[role="option"]');
+      if (li) activateOption(li);
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!wrapper.contains(event.target)) setExpanded(false);
+    });
+
+    customSelectResets.push(() => {
+      items().forEach((el) => el.setAttribute('aria-selected', 'false'));
+      triggerText.textContent = placeholderText;
+      triggerText.classList.add('is-placeholder');
+      clearInvalid();
+      setExpanded(false);
+    });
   };
 
-  if (
-    !isValidEmail(payload.email) ||
-    !payload.hotel_name ||
-    !payload.role ||
-    !payload.rooms_range ||
-    !payload.main_problem
-  ) {
-    setEarlyFormStatus('Controlla i campi evidenziati e riprova.', 'error');
-    return;
-  }
+  earlyForm.querySelectorAll('#earlyFormStep2 select[required]').forEach(initCustomSelect);
 
-  earlyFormSubmitting = true;
-  if (earlyFormButton) {
-    earlyFormButton.disabled = true;
-    earlyFormButton.textContent = 'Invio in corso…';
-  }
-  setEarlyFormStatus('', null);
+  const setMessage = (text, state) => {
+    messageEl.innerHTML = text ? `${state === 'success' ? successIcon : state === 'error' ? errorIcon : ''}<span>${text}</span>` : '';
+    messageEl.classList.toggle('is-success', state === 'success');
+    messageEl.classList.toggle('is-error', state === 'error');
+  };
 
-  try {
+  const goToStep = (stepNumber) => {
+    step1.classList.toggle('is-active', stepNumber === 1);
+    step2.classList.toggle('is-active', stepNumber === 2);
+    progressDots.forEach((dot) => {
+      dot.classList.toggle('is-active', Number(dot.dataset.stepDot) <= stepNumber);
+    });
+    progressFill.style.width = stepNumber === 2 ? '100%' : '0%';
+    progressLabel.textContent = `Passo ${stepNumber} di 2`;
+    setMessage('');
+    const focusTarget = stepNumber === 1 ? step1.querySelector('input') : step2.querySelector('.select-trigger, select');
+    focusTarget?.focus();
+  };
+
+  nextBtn.addEventListener('click', () => {
+    const invalidField = Array.from(step1.querySelectorAll('input')).find((input) => !input.checkValidity());
+    if (invalidField) {
+      invalidField.reportValidity();
+      return;
+    }
+    goToStep(2);
+  });
+
+  backBtn.addEventListener('click', () => goToStep(1));
+
+  const submitEarlyAccess = async (payload) => {
     const response = await fetch(EARLY_ACCESS_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
     const body = await response.json().catch(() => null);
+    if (!response.ok || !body || !body.ok) throw new Error('early_access_request_failed');
+    return body;
+  };
 
-    if (response.ok && body && body.ok) {
-      setEarlyFormStatus(
-        body.status === 'updated'
+  earlyForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (isSubmitting) return;
+
+    if (!step2.classList.contains('is-active')) {
+      nextBtn.click();
+      return;
+    }
+
+    const step2Fields = Array.from(step2.querySelectorAll('select[required]'));
+    const firstInvalid = step2Fields.find((field) => !field.checkValidity());
+    if (firstInvalid) {
+      if (typeof firstInvalid.reportCustomInvalidity === 'function') {
+        firstInvalid.reportCustomInvalidity();
+      } else {
+        firstInvalid.reportValidity();
+      }
+      return;
+    }
+
+    isSubmitting = true;
+    submitBtn.disabled = true;
+    backBtn.disabled = true;
+    submitLabel.textContent = 'Invio in corso…';
+    submitSpinner.hidden = false;
+    setMessage('');
+
+    try {
+      const data = new FormData(earlyForm);
+      const payload = {
+        email: String(data.get('email') || '').trim().toLowerCase(),
+        hotel_name: String(data.get('hotel_name') || '').trim(),
+        role: String(data.get('role') || ''),
+        rooms_range: String(data.get('rooms_range') || ''),
+        main_problem: data.getAll('main_problem').map(String),
+        marketing_consent: data.get('marketing_consent') === 'on',
+        ...readStoredUtmParams(),
+        landing_path: window.location.pathname,
+        // Honeypot -- a real visitor never sees or reaches this field. Sent
+        // as-is; the backend decides what a non-empty value means.
+        website: String(data.get('website') || ''),
+      };
+
+      const result = await submitEarlyAccess(payload);
+
+      earlyForm.reset();
+      customSelectResets.forEach((reset) => reset());
+      goToStep(1);
+      setMessage(
+        result.status === 'updated'
           ? 'Richiesta ricevuta. Abbiamo aggiornato i tuoi dati.'
           : 'Richiesta ricevuta. Ti contatteremo presto.',
         'success',
       );
-      earlyForm.reset();
-    } else {
-      // Never surface response body details (error codes, etc.) to the visitor.
-      setEarlyFormStatus('Non siamo riusciti a inviare la richiesta. Riprova tra poco.', 'error');
+    } catch (error) {
+      setMessage('Non siamo riusciti a inviare la richiesta. Riprova tra poco.', 'error');
+    } finally {
+      isSubmitting = false;
+      submitBtn.disabled = false;
+      backBtn.disabled = false;
+      submitLabel.textContent = 'Richiedi early access';
+      submitSpinner.hidden = true;
     }
-  } catch {
-    setEarlyFormStatus('Non siamo riusciti a inviare la richiesta. Riprova tra poco.', 'error');
-  } finally {
-    earlyFormSubmitting = false;
-    if (earlyFormButton) {
-      earlyFormButton.disabled = false;
-      earlyFormButton.textContent = EARLY_FORM_DEFAULT_LABEL;
-    }
-  }
-});
+  });
+}

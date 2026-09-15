@@ -67,9 +67,12 @@ sostituire con `import.meta.env.VITE_HOMISUITE_API_BASE_URL`.
 
 ### Comportamento del form
 
-- Campi: email di lavoro, hotel, ruolo, numero camere, problema principale
-  (tutti obbligatori) + consenso marketing (facoltativo, default `false`
+- Campi: email di lavoro, hotel, ruolo, numero camere, cosa vorresti
+  semplificare (multi-select, almeno una scelta obbligatoria; inviato al
+  backend come array) + consenso marketing (facoltativo, default `false`
   — la richiesta funziona anche senza).
+- Il form è diviso in due passi (email/hotel, poi il resto); si passa al
+  passo 2 solo quando i campi del passo 1 sono validi.
 - Un campo nascosto (`website`, honeypot) è presente nel DOM ma invisibile
   e non raggiungibile da tastiera per un utente reale; un bot che lo
   compila riceve una risposta di successo apparente, ma nulla viene
@@ -90,6 +93,13 @@ tutta la sessione del tab, anche se l'utente naviga nella pagina prima di
 compilare il form. Vengono allegati automaticamente all'invio, insieme a
 `landing_path` (il path corrente). Non sono mai mostrati come campi nel
 form.
+
+## Email di conferma Early Access
+
+`email-templates/early-access-confirmation.html` è il template dell'email da
+inviare a chi compila il form, in stile coerente con la landing. Il template e
+le istruzioni per l'invio (da implementare nel backend `homisuite-app`, non
+qui) sono documentate in `email-templates/README.md`.
 
 ## Asset
 
