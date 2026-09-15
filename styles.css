@@ -271,7 +271,7 @@ fieldset.form-step { border: 0; padding: 0; margin: 0; min-width: 0; }
 .select-listbox::-webkit-scrollbar-thumb { background: var(--purple-soft); border-radius: 999px; }
 .select-listbox::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
 .select-listbox.is-open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
-.select-listbox li { padding: 10px 12px; border-radius: 9px; font-size: .88rem; font-weight: 700; color: var(--navy); cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; transition: background .12s ease, color .12s ease; }
+.select-listbox li { padding: 10px 12px; border-radius: 9px; font-size: .88rem; font-weight: 500; color: var(--navy); cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; transition: background .12s ease, color .12s ease; }
 .select-listbox li.is-active,
 .select-listbox li:hover { background: var(--lavender); color: var(--purple-2); }
 .select-listbox li[aria-selected="true"] { background: var(--purple-soft); color: var(--purple-2); font-weight: 800; }
