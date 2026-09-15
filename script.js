@@ -23,7 +23,7 @@ document.querySelectorAll('.nav-links a').forEach(link => {
 // before deploying; see README for where to find the real value.
 // ---------------------------------------------------------------------------
 
-const HOMISUITE_API_BASE_URL = 'https://REPLACE_WITH_SUPABASE_PROJECT_REF.supabase.co/functions/v1';
+const HOMISUITE_API_BASE_URL = 'https://flyedzqqdrxxtxchoeer.supabase.co/functions/v1';
 const EARLY_ACCESS_ENDPOINT = `${HOMISUITE_API_BASE_URL}/early-access-signup`;
 
 const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];

@@ -39,14 +39,14 @@ POST <HOMISUITE_API_BASE_URL>/early-access-signup
 dove l'URL reale è:
 
 ```
-https://<project-ref>.supabase.co/functions/v1
+https://flyedzqqdrxxtxchoeer.supabase.co/functions/v1
 ```
 
-(`<project-ref>` è il project ref del progetto Supabase di homisuite-app —
-chiedilo al team backend, non è pubblicato qui). Il backend valida tutto
-server-side, salva/aggiorna il lead e invia la notifica a
-`info@homisuite.com` — questa landing non parla mai direttamente con
-Supabase e non conosce nessuna chiave segreta.
+(il project ref è un identificativo pubblico, non un segreto — la stessa
+convenzione della anon key). Il backend valida tutto server-side,
+salva/aggiorna il lead e invia la notifica a `info@homisuite.com` —
+questa landing non parla mai direttamente con Supabase e non conosce
+nessuna chiave segreta.
 
 ### Configurazione locale
 
@@ -56,13 +56,13 @@ iniettato in build. La base URL dell'endpoint è una **costante** in cima a
 `script.js`:
 
 ```js
-const HOMISUITE_API_BASE_URL = 'https://REPLACE_WITH_SUPABASE_PROJECT_REF.supabase.co/functions/v1';
+const HOMISUITE_API_BASE_URL = 'https://flyedzqqdrxxtxchoeer.supabase.co/functions/v1';
 ```
 
-Modifica quella riga con il project ref reale prima di pubblicare in un
-ambiente (development/production) — è l'unico punto da toccare per
-cambiare a quale backend punta il form. Se in futuro questo sito diventa
-un progetto Vite (o altro bundler), quella costante è il punto naturale da
+Se in futuro il progetto Supabase di homisuite-app cambia (nuovo
+ambiente/project ref), è l'unico punto da modificare per cambiare a quale
+backend punta il form. Se in futuro questo sito diventa un progetto Vite
+(o altro bundler), quella costante è il punto naturale da
 sostituire con `import.meta.env.VITE_HOMISUITE_API_BASE_URL`.
 
 ### Comportamento del form
