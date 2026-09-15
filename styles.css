@@ -321,13 +321,15 @@ fieldset.form-step { border: 0; padding: 0; margin: 0; min-width: 0; }
   .nav-links.open { display:flex; }
   .nav-wrap > .button-small { display:none; }
   .menu-toggle { display:block; margin-left:auto; }
-  .hero-grid, .intro-grid, .benefits-grid, .cta-card { grid-template-columns:1fr; }
+  /* These gaps separate side-by-side columns on desktop; once collapsed to
+     a single column just above they'd otherwise stay at their desktop size
+     and read as a large blank gap between two stacked blocks instead. */
+  .hero-grid, .intro-grid, .benefits-grid, .cta-card { grid-template-columns:1fr; gap:36px; }
   .hero-visual { min-height:570px; margin-top:10px; }
   .laptop-shell { left:65px; }
   .multilingual-card { right:0; }
   .section-heading { grid-template-columns:1fr; align-items:start; }
   .section-heading p { max-width:650px; }
-  .benefits-grid { gap:35px; }
 }
 
 @media (max-width: 720px) {
@@ -360,6 +362,11 @@ fieldset.form-step { border: 0; padding: 0; margin: 0; min-width: 0; }
 }
 
 @media (max-width: 520px) {
+  /* 80px (this section's own bottom padding) + 80px (the next section's
+     top padding) stacked up to 160px of dead vertical space between
+     sections on a phone -- tighten it here specifically, where screen
+     height is scarce enough for that to actually matter. */
+  .section { padding: 60px 0; }
   .early-form-row { flex-direction:column; gap:0; }
   .hero h1 { font-size:2.72rem; }
   .hero-lead { font-size:1rem; }
