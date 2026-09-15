@@ -140,7 +140,8 @@ body::before {
 .chip-icon { display: grid; place-items: center; width: 29px; height: 29px; border-radius: 10px; background: var(--lavender); color: var(--purple-2); font-weight: 800; }
 .chip-icon .icon { width: 16px; height: 16px; }
 
-.hero-visual { position: relative; min-height: 610px; }
+.hero-visual { position: relative; min-height: 610px; perspective: 1300px; }
+.laptop-shell, .phone-shell { transition: transform .4s cubic-bezier(.22,1,.36,1); }
 .glass-card { background: rgba(255,255,255,.86); border: 1px solid rgba(255,255,255,.9); backdrop-filter: blur(18px); box-shadow: var(--shadow); }
 .multilingual-card { position: absolute; right: -20px; top: -18px; width: 220px; padding: 20px; border-radius: 22px; z-index: 5; }
 .multilingual-card strong { display: block; color: var(--navy); line-height: 1.25; font-size: 1rem; }
@@ -221,9 +222,10 @@ h2 { margin: 0; font-size: clamp(2.25rem,4vw,4rem); line-height:1.03; letter-spa
 
 .form-progress { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
 .form-progress-step { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; font-size: .74rem; font-weight: 800; background: rgba(255,255,255,.16); color: #d8d2ed; border: 1px solid rgba(255,255,255,.32); transition: background .2s ease, color .2s ease; }
-.form-progress-step.is-active { background: white; color: var(--purple-2); }
+.form-progress-step.is-active { background: white; color: var(--purple-2); animation: dot-pop .45s cubic-bezier(.34,1.56,.64,1); }
+@keyframes dot-pop { 0% { transform: scale(1); } 45% { transform: scale(1.3); } 100% { transform: scale(1); } }
 .form-progress-track { flex: 1; height: 3px; border-radius: 2px; background: rgba(255,255,255,.22); overflow: hidden; }
-.form-progress-fill { display: block; height: 100%; width: 0; background: white; transition: width .25s ease; }
+.form-progress-fill { display: block; height: 100%; width: 0; background: white; transition: width .45s cubic-bezier(.34,1.56,.64,1); }
 .form-progress-label { font-size: .72rem; font-weight: 700; color: #d8d2ed; white-space: nowrap; }
 
 .form-step { display: none; }
@@ -286,6 +288,15 @@ fieldset.form-step { border: 0; padding: 0; margin: 0; min-width: 0; }
 
 .toast { position:fixed; right:20px; bottom:20px; max-width:360px; padding:16px 18px; border-radius:14px; background:var(--navy); color:white; box-shadow:0 20px 55px rgba(25,25,50,.25); z-index:100; animation:toast-in .25s ease; }
 @keyframes toast-in { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+
+.js-reveal-ready .reveal { opacity: 0; transform: translateY(26px); transition: opacity .6s ease, transform .6s cubic-bezier(.16,1,.3,1); }
+.js-reveal-ready .reveal.is-visible { opacity: 1; transform: none; }
+
+.form-message .icon circle,
+.form-message .icon path,
+.form-message .icon line { stroke-dasharray: 1; stroke-dashoffset: 1; animation: icon-draw .5s ease forwards; }
+.form-message .icon path { animation-delay: .22s; }
+@keyframes icon-draw { to { stroke-dashoffset: 0; } }
 
 @media (max-width: 980px) {
   .nav-links { display:none; position:absolute; left:20px; right:20px; top:70px; padding:18px; border-radius:18px; background:white; box-shadow:var(--shadow); flex-direction:column; gap:12px; }

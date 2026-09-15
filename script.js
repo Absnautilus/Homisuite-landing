@@ -13,6 +13,83 @@ document.querySelectorAll('.nav-links a').forEach(link => {
   });
 });
 
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Scroll-reveal: sections fade/slide in as they enter the viewport. The
+// hiding class only ever applies once JS has actually run (js-reveal-ready),
+// so a page with JS disabled or failed never leaves content stuck invisible.
+const revealEls = document.querySelectorAll('.reveal');
+if (revealEls.length) {
+  if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+    revealEls.forEach((el) => el.classList.add('is-visible'));
+  } else {
+    document.documentElement.classList.add('js-reveal-ready');
+    const revealGroups = new Map();
+    revealEls.forEach((el) => {
+      const index = revealGroups.get(el.parentElement) || 0;
+      el.style.transitionDelay = `${Math.min(index, 5) * 70}ms`;
+      revealGroups.set(el.parentElement, index + 1);
+    });
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+    revealEls.forEach((el) => revealObserver.observe(el));
+  }
+}
+
+// Dashboard mockup KPI numbers count up from 0 the first time they scroll into view.
+const kpiContainer = document.querySelector('.mock-kpis');
+if (kpiContainer && 'IntersectionObserver' in window) {
+  const kpiNumbers = kpiContainer.querySelectorAll('strong');
+  const animateCount = (el) => {
+    const target = parseInt(el.textContent, 10);
+    if (Number.isNaN(target)) return;
+    if (prefersReducedMotion) return;
+    const duration = 900;
+    const start = performance.now();
+    const step = (now) => {
+      const progress = Math.min(1, (now - start) / duration);
+      const eased = 1 - (1 - progress) ** 3;
+      el.textContent = String(Math.round(target * eased));
+      if (progress < 1) requestAnimationFrame(step);
+      else el.textContent = String(target);
+    };
+    requestAnimationFrame(step);
+  };
+  const kpiObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      kpiNumbers.forEach(animateCount);
+      observer.disconnect();
+    });
+  }, { threshold: 0.4 });
+  kpiObserver.observe(kpiContainer);
+}
+
+// Subtle pointer-driven tilt on the laptop/phone mockup, desktop-with-mouse only.
+const heroVisual = document.querySelector('.hero-visual');
+const laptopShell = document.querySelector('.laptop-shell');
+const phoneShell = document.querySelector('.phone-shell');
+if (heroVisual && laptopShell && !prefersReducedMotion && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+  heroVisual.addEventListener('mousemove', (event) => {
+    const rect = heroVisual.getBoundingClientRect();
+    const px = (event.clientX - rect.left) / rect.width - 0.5;
+    const py = (event.clientY - rect.top) / rect.height - 0.5;
+    laptopShell.style.transform = `rotateX(${(-py * 6).toFixed(2)}deg) rotateY(${(px * 8).toFixed(2)}deg)`;
+    if (phoneShell) {
+      phoneShell.style.transform = `rotateX(${(-py * 9).toFixed(2)}deg) rotateY(${(px * 11).toFixed(2)}deg) translateY(${(-py * 6).toFixed(2)}px)`;
+    }
+  });
+  heroVisual.addEventListener('mouseleave', () => {
+    laptopShell.style.transform = '';
+    if (phoneShell) phoneShell.style.transform = '';
+  });
+}
+
 const earlyForm = document.querySelector('#earlyForm');
 
 if (earlyForm) {
@@ -28,8 +105,8 @@ if (earlyForm) {
   const progressFill = earlyForm.querySelector('#earlyFormProgressFill');
   const progressLabel = earlyForm.querySelector('#earlyFormProgressLabel');
 
-  const successIcon = '<svg class="icon icon-check-circle-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="m16 9-5.5 5.5L8 12" /></svg>';
-  const errorIcon = '<svg class="icon icon-alert-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><line x1="12" x2="12" y1="8" y2="12" /><line x1="12" x2="12.01" y1="16" y2="16" /></svg>';
+  const successIcon = '<svg class="icon icon-check-circle-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" pathLength="1" /><path d="m16 9-5.5 5.5L8 12" pathLength="1" /></svg>';
+  const errorIcon = '<svg class="icon icon-alert-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" pathLength="1" /><line x1="12" x2="12" y1="8" y2="12" pathLength="1" /><line x1="12" x2="12.01" y1="16" y2="16" pathLength="1" /></svg>';
 
   let isSubmitting = false;
   const customSelectResets = [];
