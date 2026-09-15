@@ -90,6 +90,59 @@ if (heroVisual && laptopShell && !prefersReducedMotion && window.matchMedia('(ho
   });
 }
 
+// ---------------------------------------------------------------------------
+// Early access form -> homisuite-app's early-access-signup Edge Function
+// (a separate repository/deployment; see README's "Form early access").
+//
+// This is a build-free static site (no Vite/webpack, no package.json) --
+// there is no bundler to inject a VITE_-style env var at build time, so the
+// endpoint base is a plain constant instead. Replace it per environment
+// before deploying; see README for where to find the real value.
+// ---------------------------------------------------------------------------
+
+const HOMISUITE_API_BASE_URL = 'https://flyedzqqdrxxtxchoeer.supabase.co/functions/v1';
+const EARLY_ACCESS_ENDPOINT = `${HOMISUITE_API_BASE_URL}/early-access-signup`;
+
+const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+const UTM_STORAGE_KEY = 'homisuite_utm';
+
+// Runs once per script load (effectively once per page view). Only writes
+// when the current URL actually carries at least one UTM param, so a later
+// page view within the same tab -- e.g. clicking an internal anchor link --
+// never wipes out attribution a previous, UTM-carrying URL already
+// recorded. sessionStorage, not a cookie: no cross-session tracking, and
+// nothing to disclose in a cookie banner for this alone.
+function captureUtmParams() {
+  const params = new URLSearchParams(window.location.search);
+  const found = {};
+  let hasAny = false;
+  UTM_KEYS.forEach((key) => {
+    const value = params.get(key);
+    if (value) {
+      found[key] = value;
+      hasAny = true;
+    }
+  });
+  if (!hasAny) return;
+  try {
+    sessionStorage.setItem(UTM_STORAGE_KEY, JSON.stringify(found));
+  } catch {
+    // Private browsing / storage disabled: the request still works, it
+    // just won't carry UTM attribution.
+  }
+}
+
+function readStoredUtmParams() {
+  try {
+    const raw = sessionStorage.getItem(UTM_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+captureUtmParams();
+
 const earlyForm = document.querySelector('#earlyForm');
 
 if (earlyForm) {
@@ -325,8 +378,16 @@ if (earlyForm) {
 
   backBtn.addEventListener('click', () => goToStep(1));
 
-  // Placeholder locale in attesa che il backend Early Access (repo homisuite-app) sia collegato: da sostituire con una vera chiamata fetch all'endpoint.
-  const submitEarlyAccess = () => new Promise((resolve) => setTimeout(() => resolve({ ok: true }), 600));
+  const submitEarlyAccess = async (payload) => {
+    const response = await fetch(EARLY_ACCESS_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const body = await response.json().catch(() => null);
+    if (!response.ok || !body || !body.ok) throw new Error('early_access_request_failed');
+    return body;
+  };
 
   earlyForm.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -357,22 +418,31 @@ if (earlyForm) {
 
     try {
       const data = new FormData(earlyForm);
-      const payload = {};
-      for (const [key, value] of data.entries()) {
-        if (key in payload) {
-          payload[key] = Array.isArray(payload[key]) ? [...payload[key], value] : [payload[key], value];
-        } else {
-          payload[key] = value;
-        }
-      }
-      console.log('Early access request', payload);
+      const payload = {
+        email: String(data.get('email') || '').trim().toLowerCase(),
+        hotel_name: String(data.get('hotel_name') || '').trim(),
+        role: String(data.get('role') || ''),
+        rooms_range: String(data.get('rooms_range') || ''),
+        main_problem: data.getAll('main_problem').map(String),
+        marketing_consent: data.get('marketing_consent') === 'on',
+        ...readStoredUtmParams(),
+        landing_path: window.location.pathname,
+        // Honeypot -- a real visitor never sees or reaches this field. Sent
+        // as-is; the backend decides what a non-empty value means.
+        website: String(data.get('website') || ''),
+      };
 
-      await submitEarlyAccess();
+      const result = await submitEarlyAccess(payload);
 
       earlyForm.reset();
       customSelectResets.forEach((reset) => reset());
       goToStep(1);
-      setMessage('Richiesta ricevuta. Ti contatteremo presto.', 'success');
+      setMessage(
+        result.status === 'updated'
+          ? 'Richiesta ricevuta. Abbiamo aggiornato i tuoi dati.'
+          : 'Richiesta ricevuta. Ti contatteremo presto.',
+        'success',
+      );
     } catch (error) {
       setMessage('Non siamo riusciti a inviare la richiesta. Riprova tra poco.', 'error');
     } finally {
