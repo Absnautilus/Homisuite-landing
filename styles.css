@@ -149,7 +149,8 @@ body::before {
 .mock-kpis article { background: white; border-radius: 13px; padding: 12px; border: 1px solid #ececf5; min-width: 0; }
 .mock-kpis strong { display: block; color: var(--navy); font-size: 1.05rem; margin-top: 8px; }
 .mock-kpis small { display: block; color: #777d9d; font-size: .54rem; line-height: 1.3; margin-top: 2px; }
-.kpi-icon, .row-icon { width: 22px; height: 22px; border-radius: 8px; display: grid; place-items: center; font-size: .7rem; background: #f4e8fa; color: #9c4fc7; }
+.kpi-icon, .row-icon { width: 26px; height: 26px; border-radius: 9px; display: grid; place-items: center; background: #f4e8fa; color: #9c4fc7; flex-shrink: 0; }
+.kpi-icon svg, .row-icon svg { width: 14px; height: 14px; }
 .mock-list { background: white; border-radius: 14px; padding: 12px; border: 1px solid #ececf5; }
 .list-header { display:flex; justify-content:space-between; font-size:.64rem; color:var(--navy); margin-bottom: 5px; }.list-header span{color:var(--purple-2)}
 .mock-row { display:grid; grid-template-columns:26px 1fr 40px 62px; align-items:center; gap:8px; padding:10px 2px; border-top:1px solid #f0f0f5; font-size:.57rem; }
@@ -229,7 +230,7 @@ fieldset.form-step { border: 0; padding: 0; margin: 0; min-width: 0; }
 .form-message.is-error { color: #ffd0d0; }
 
 .select-field { position: relative; }
-.select-native { position: absolute; opacity: 0; width: 1px; height: 1px; padding: 0; margin: 0; border: 0; pointer-events: none; }
+.early-form select.select-native { position: absolute; opacity: 0; width: 1px; height: 1px; min-height: 0; padding: 0; margin: 0; border: 0; pointer-events: none; }
 .select-trigger { all: unset; box-sizing: border-box; width: 100%; height: 46px; border-radius: 12px; border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.92); padding: 0 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--navy); font: inherit; font-weight: 600; cursor: pointer; }
 .select-trigger-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .select-trigger-text.is-placeholder { color: #83839f; font-weight: 500; }

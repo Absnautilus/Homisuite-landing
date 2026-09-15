@@ -73,6 +73,7 @@ if (earlyForm) {
 
     select.parentElement.insertBefore(wrapper, select);
     wrapper.append(trigger, listbox, select, error);
+    select.classList.add('select-native');
     select.tabIndex = -1;
     select.setAttribute('aria-hidden', 'true');
 
