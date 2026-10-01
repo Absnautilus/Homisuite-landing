@@ -1,3 +1,29 @@
+// Strings for the handful of UI messages the JS itself generates (everything
+// else lives directly in each language's HTML, since this is a build-free
+// static site with no templating -- /en/index.html is a full translated
+// copy, not a runtime-swapped one). Keyed off <html lang>, read once.
+const LANG = document.documentElement.lang === 'en' ? 'en' : 'it';
+const STRINGS = {
+  it: {
+    selectAnOption: 'Seleziona un’opzione.',
+    step: (n) => `Passo ${n} di 2`,
+    sending: 'Invio in corso…',
+    submitDefault: 'Richiedi early access',
+    successCreated: 'Richiesta ricevuta. Ti contatteremo presto.',
+    successUpdated: 'Richiesta ricevuta. Abbiamo aggiornato i tuoi dati.',
+    error: 'Non siamo riusciti a inviare la richiesta. Riprova tra poco.',
+  },
+  en: {
+    selectAnOption: 'Please select an option.',
+    step: (n) => `Step ${n} of 2`,
+    sending: 'Sending…',
+    submitDefault: 'Request early access',
+    successCreated: 'Request received. We’ll be in touch soon.',
+    successUpdated: 'Request received. We’ve updated your details.',
+    error: 'We couldn’t send your request. Please try again shortly.',
+  },
+}[LANG];
+
 const menuToggle = document.querySelector('.menu-toggle');
 const navLinks = document.querySelector('.nav-links');
 
@@ -239,7 +265,7 @@ if (earlyForm) {
 
     const markInvalid = () => {
       trigger.classList.add('is-invalid');
-      error.textContent = 'Seleziona un’opzione.';
+      error.textContent = STRINGS.selectAnOption;
       error.hidden = false;
       trigger.focus();
     };
@@ -361,7 +387,7 @@ if (earlyForm) {
       dot.classList.toggle('is-active', Number(dot.dataset.stepDot) <= stepNumber);
     });
     progressFill.style.width = stepNumber === 2 ? '100%' : '0%';
-    progressLabel.textContent = `Passo ${stepNumber} di 2`;
+    progressLabel.textContent = STRINGS.step(stepNumber);
     setMessage('');
     const focusTarget = stepNumber === 1 ? step1.querySelector('input') : step2.querySelector('.select-trigger, select');
     focusTarget?.focus();
@@ -412,7 +438,7 @@ if (earlyForm) {
     isSubmitting = true;
     submitBtn.disabled = true;
     backBtn.disabled = true;
-    submitLabel.textContent = 'Invio in corso…';
+    submitLabel.textContent = STRINGS.sending;
     submitSpinner.hidden = false;
     setMessage('');
 
@@ -438,18 +464,16 @@ if (earlyForm) {
       customSelectResets.forEach((reset) => reset());
       goToStep(1);
       setMessage(
-        result.status === 'updated'
-          ? 'Richiesta ricevuta. Abbiamo aggiornato i tuoi dati.'
-          : 'Richiesta ricevuta. Ti contatteremo presto.',
+        result.status === 'updated' ? STRINGS.successUpdated : STRINGS.successCreated,
         'success',
       );
     } catch (error) {
-      setMessage('Non siamo riusciti a inviare la richiesta. Riprova tra poco.', 'error');
+      setMessage(STRINGS.error, 'error');
     } finally {
       isSubmitting = false;
       submitBtn.disabled = false;
       backBtn.disabled = false;
-      submitLabel.textContent = 'Richiedi early access';
+      submitLabel.textContent = STRINGS.submitDefault;
       submitSpinner.hidden = true;
     }
   });
