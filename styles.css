@@ -99,8 +99,10 @@ body::before {
 .nav-wrap { min-height: 78px; display: flex; align-items: center; gap: 28px; }
 .brand { display: inline-flex; align-items: center; gap: 10px; font-size: 1.28rem; font-weight: 800; color: var(--navy); }
 .brand-icon { width: 34px; height: 34px; border-radius: 10px; }
-.nav-links { display: flex; gap: 28px; margin-left: auto; color: #656b8c; font-weight: 600; font-size: .94rem; }
+.nav-links { display: flex; align-items: center; gap: 28px; margin-left: auto; color: #656b8c; font-weight: 600; font-size: .94rem; }
 .nav-links a:hover { color: var(--purple-2); }
+.lang-switch { display: inline-flex; align-items: center; padding: 5px 12px; border: 1px solid var(--border); border-radius: 999px; font-weight: 700; font-size: .82rem; letter-spacing: .02em; }
+.lang-switch:hover { color: var(--purple-2); border-color: var(--purple-soft); }
 .menu-toggle { display: none; position: relative; border: 0; background: transparent; color: var(--navy); padding: 6px; width: 36px; height: 36px; }
 .menu-toggle .icon { position: absolute; top: 50%; left: 50%; width: 24px; height: 24px; margin: -12px 0 0 -12px; transition: opacity .18s ease, transform .28s cubic-bezier(.34,1.56,.64,1); }
 .menu-toggle .icon-x { opacity: 0; transform: rotate(-90deg) scale(.5); }
